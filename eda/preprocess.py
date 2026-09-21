@@ -29,7 +29,8 @@ ROOT = os.path.dirname(HERE)
 CSV_PATH = os.path.join(ROOT, "train_augmented.csv")
 OUT_PATH = os.path.join(ROOT, "clean.csv")
 
-# 半角 → 全角 标点映射
+# 半角 → 全角 标点映射（仅这些确定是中文标点用法的才转）
+# 故意不含 - / ' ，因为它们在本数据集中几乎全是数字化/型号化用途（见 PREPROCESS.md 第四节）
 _HALF2FULL = str.maketrans({
     ",": "，", ":": "：", ";": "；", "!": "！", "?": "？",
     "(": "（", ")": "）", '"': "”",
