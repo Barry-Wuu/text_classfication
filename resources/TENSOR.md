@@ -83,27 +83,29 @@ jieba 分词 → 词频统计 → 构建词表（`<pad>=0`、`<unk>=1`，过滤�
 
 ### 3.3 TF-IDF 之上换分类器：多算法横向对比
 
-同一份 TF-IDF 特征（jieba 分词 + 词频，`min_df=2`，25,251 维）+ 同一无泄漏划分，横向比 11 个分类器（fastText 用同一训练/测试集、自行分词训练）。脚本：`resources/compare_tfidf_clf.py`、`resources/compare_tfidf_gbdt.py`、`resources/compare_fasttext.py`（本机 CPU）。
+同一份 TF-IDF 特征（jieba 分词 + 词频，`min_df=2`，25,251 维）+ 同一无泄漏划分，横向比 12 个方法（fastText 用同一训练/测试集自行分词；Jev 直接对测试文本调大模型 API）。脚本：`resources/compare_tfidf_clf.py`、`resources/compare_tfidf_gbdt.py`、`resources/compare_fasttext.py`、`resources/compare_jev.py`（本机 CPU；Jev 走网络 API）。
 
-| 模型 | macro-F1 | 准确率 | 训练耗时 |
+| 方法 | macro-F1 | 准确率 | 耗时 |
 |---|---:|---:|---:|
-| LinearSVC | **0.8221** | 0.8229 | 7.3s |
-| SGD（hinge） | 0.8138 | 0.8157 | 1.5s |
-| ComplementNB | 0.8068 | 0.8128 | 0.1s |
-| LogisticRegression | 0.7866 | 0.8012 | 11.1s |
-| fastText | 0.7687 | 0.7779 | 36.1s |
-| LightGBM | 0.7665 | 0.7845 | 377s |
-| ExtraTrees | 0.7651 | 0.7729 | 787s |
-| XGBoost | 0.7478 | 0.7649 | 1426s |
-| MultinomialNB | 0.7455 | 0.7779 | 0.1s |
-| RandomForest | 0.7351 | 0.7518 | 226s |
-| kNN（cosine） | 0.6364 | 0.6531 | 0.4s |
+| LinearSVC | **0.8221** | 0.8229 | 7.3s（训练） |
+| SGD（hinge） | 0.8138 | 0.8157 | 1.5s（训练） |
+| ComplementNB | 0.8068 | 0.8128 | 0.1s（训练） |
+| LogisticRegression | 0.7866 | 0.8012 | 11.1s（训练） |
+| fastText | 0.7687 | 0.7779 | 36.1s（训练） |
+| LightGBM | 0.7665 | 0.7845 | 377s（训练） |
+| ExtraTrees | 0.7651 | 0.7729 | 787s（训练） |
+| XGBoost | 0.7478 | 0.7649 | 1426s（训练） |
+| MultinomialNB | 0.7455 | 0.7779 | 0.1s（训练） |
+| RandomForest | 0.7351 | 0.7518 | 226s（训练） |
+| Jev（大模型 API） | 0.7327 | 0.7351 | 85.7s（1378 条推理总耗时） |
+| kNN（cosine） | 0.6364 | 0.6531 | 0.4s（训练） |
 
 结论：
 
 - **线性模型明显优于树模型**。TF-IDF 是 25,251 维的高维稀疏特征，线性模型天然契合；树模型在稀疏高维上难以有效分裂，RandomForest 训练 226 秒反而只有 0.7351，ExtraTrees 训练 787 秒也仅 0.7651。
 - **梯度提升树同样不划算**（XGBoost / LightGBM）：作为"更强的树模型"，二者精度仅 0.75~0.77，仍落后线性模型 5~7 个点；XGBoost 训练要 1,426 秒（约 LinearSVC 的 200 倍），LightGBM 因直方图算法 + 叶子生长更快（377 秒）但仍不敌线性 SVM。
 - **fastText 表现中游**（0.7687）：36 秒训练，优于全部树模型，但比线性 SVM 低约 5 个点。原因在于本文本的关键信号集中在少数强判别词（品牌/业务词），词袋线性模型已能充分捕捉，fastText 的 n-gram 子词与浅层嵌入未带来额外收益。
+- **大模型 API 未占优**（Jev 0.7327）：Jev 是 TypeSafe 的 System One 模型，用 Choice 原语把 18 个类名作为候选项做结构化分类，返回判定与置信度（平均置信 0.914），无需训练数据。但全量 1378 条上仅 0.7327，低于线性 SVM 约 9 个点、略高于随机森林；优势在于零训练、开箱即用，而非精度。
 - **朴素贝叶斯是秒级兜底**：ComplementNB 仅 0.1 秒即得 0.8068。
 
 ### 3.4 结论与部署推荐
