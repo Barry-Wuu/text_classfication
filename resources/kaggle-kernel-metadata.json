@@ -1,0 +1,14 @@
+{
+  "id": "wubarry/textcls-tensor-compare",
+  "title": "textcls tensor compare",
+  "code_file": "compare_tensors.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "is_internet_enabled": true,
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": []
+}

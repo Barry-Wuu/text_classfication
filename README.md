@@ -135,12 +135,28 @@ is_aug   : 0
 ```
 text_classfication/
 ├── README.md                项目说明
-├── train_augmented.csv      训练数据（30,000 条，18 类）
-└── eda/                     探索性数据分析
-    ├── eda.py               分析脚本（matplotlib + jieba + wordcloud）
-    ├── EDA.md               分析报告与结论
-    ├── eda_summary.txt      关键统计量汇总
-    └── figures/             分析图表（含词云）
+├── train_augmented.csv      训练数据（30,000 条，18 类，含规则增强字段）
+├── clean.csv                字符级清洗后的数据（text, category 两列）
+├── labeled.csv              清洗 + 整数标签（text, category, label 三列）
+├── eda/                     探索性数据分析
+│   ├── eda.py               分析脚本（matplotlib + jieba + wordcloud）
+│   ├── EDA.md               分析报告与结论
+│   ├── eda_summary.txt      关键统计量汇总
+│   ├── ab_test.py           省流 A/B 增益对比
+│   ├── ab_speed.py          省流 A/B 速度对比
+│   └── figures/             分析图表（含词云）
+└── resources/               预处理与建模资产
+    ├── preprocess.py        字符级清洗脚本
+    ├── normalize_ids.py     强标识符省流脚本
+    ├── build_labels.py      标签表与整数标签生成脚本
+    ├── to_tensor_bert.py    BERT tokenizer 张量化脚本
+    ├── to_tensor_tfidf.py   词频自训词表 + TF-IDF 张量化脚本
+    ├── compare_tensors.py   三条张量策略效果对比脚本
+    ├── class.txt            标签表（一行一类，行号即 label id）
+    ├── label_map.csv        标签映射（id, name, count）
+    ├── vocab.txt            词表（一行一词，行号即 id）
+    ├── PREPROCESS.md        预处理报告
+    └── TENSOR.md            标签表与张量策略报告
 ```
 
 ## 六、参与方式
