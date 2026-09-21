@@ -1,0 +1,14 @@
+{
+  "id": "wubarry/textcls-noleak-compare",
+  "title": "textcls noleak compare",
+  "code_file": "compare_no_leak.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "is_internet_enabled": true,
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": []
+}
