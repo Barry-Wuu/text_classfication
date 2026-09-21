@@ -38,6 +38,8 @@ def cost(r):
 
 
 def color(n):
+    if n.startswith("Ensemble"):
+        return "#06b6d4"          # 集成(专家组) 青
     if n in ("LinearSVC", "SGD(hinge)", "LogisticRegression"):
         return "#3b82f6"          # 线性 蓝
     if n in ("RandomForest", "ExtraTrees", "XGBoost", "LightGBM"):

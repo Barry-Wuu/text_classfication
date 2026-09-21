@@ -26,6 +26,8 @@ fit = [round((r.get("fit_s") or 0.0) + (r.get("infer_s") or 0.0), 2) for r in ro
 
 
 def color(n):
+    if n.startswith("Ensemble"):
+        return "#06b6d4"          # 集成(专家组) 青
     if n in ("LinearSVC", "SGD(hinge)", "LogisticRegression"):
         return "#3b82f6"          # 线性 蓝
     if n in ("RandomForest", "ExtraTrees", "XGBoost", "LightGBM"):
@@ -60,15 +62,20 @@ ax.text(best, len(names)-0.3, f" 最高 {best:.4f}", color="#2563eb", fontsize=9
 ax.grid(axis="x", ls=":", alpha=0.4)
 ax.set_axisbelow(True)
 
-# 右：耗时（对数轴）—— 本地模型为训练+推理，大模型 API 为全量推理总耗时
+# 右：耗时（对数轴）—— 按耗时从短到长独立排序（与左面板 macro-F1 顺序解耦）
 ax = axes[1]
 ax.set_facecolor(BG)
-bars = ax.barh(y, fit, color=[color(n) for n in names], edgecolor="#334155", linewidth=0.6)
-ax.set_yticks(y); ax.set_yticklabels(names)
+order_t = sorted(range(len(names)), key=lambda i: fit[i])          # 耗时升序
+y_t = [len(order_t) - 1 - pos for pos, i in enumerate(order_t)]    # 最短在顶端
+bars = ax.barh([y_t[i] for i in range(len(names))], fit,
+               color=[color(names[i]) for i in range(len(names))],
+               edgecolor="#334155", linewidth=0.6)
+ax.set_yticks(y_t); ax.set_yticklabels([names[i] for i in range(len(names))])
 ax.set_xscale("log")
 ax.set_xlabel("耗时（秒，对数轴）")
-ax.set_title("耗时（本地模型=训练+推理；大模型 API=全量推理）", fontsize=12, fontweight="bold")
-for b, v in zip(bars, fit):
+ax.set_title("耗时（本地模型=训练+推理；大模型 API=全量推理，按耗时升序）", fontsize=12, fontweight="bold")
+for i, b in enumerate(bars):
+    v = fit[i]
     ax.text(v * 1.15, b.get_y() + b.get_height()/2, f"{v:.2f}s",
             va="center", ha="left", fontsize=9, color="#1e293b")
 ax.grid(axis="x", ls=":", alpha=0.4)
