@@ -123,11 +123,11 @@ ax.set_ylabel("macro-F1（无泄漏划分）", fontsize=11)
 ax.set_title("打榜视角 · 帕累托最优：耗时 vs 准确率（越靠左上越优）",
              fontsize=14.5, fontweight="bold")
 
-# 原点方向提示（左下角）
-ax.annotate("", xy=(0.06, 0.08), xytext=(0.02, 0.02),
+# 原点方向提示（左下角）：优方向是 耗时更小(左) + F1 更大(上) = 左上(↖)
+ax.annotate("", xy=(0.015, 0.14), xytext=(0.085, 0.025),
             xycoords="axes fraction", textcoords="axes fraction",
             arrowprops=dict(arrowstyle="-|>", color="#94a3b8", lw=1.4))
-ax.text(0.035, 0.10, "越靠左上越好\n（更快 · 更准）", transform=ax.transAxes,
+ax.text(0.09, 0.045, "越靠左上越好\n（更快 · 更准）", transform=ax.transAxes,
         fontsize=9.5, color="#64748b", ha="left", va="bottom")
 
 # 参考线：基线 F1
