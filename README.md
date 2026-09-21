@@ -158,7 +158,9 @@ is_aug   : 0
 | SGD（hinge） | 0.8138 | 0.8157 | 1.5s |
 | ComplementNB | 0.8068 | 0.8128 | 0.1s |
 | LogisticRegression | 0.7866 | 0.8012 | 11.1s |
+| LightGBM | 0.7665 | 0.7845 | 377s |
 | ExtraTrees | 0.7651 | 0.7729 | 787s |
+| XGBoost | 0.7478 | 0.7649 | 1426s |
 | MultinomialNB | 0.7455 | 0.7779 | 0.1s |
 | RandomForest | 0.7351 | 0.7518 | 226s |
 | kNN（cosine） | 0.6364 | 0.6531 | 0.4s |
@@ -166,7 +168,8 @@ is_aug   : 0
 几点观察：
 
 - **线性模型明显优于树模型**：TF-IDF 是 25,251 维的高度稀疏特征，线性模型恰好擅长；树模型在高维稀疏矩阵上难以有效分裂且过拟合，RandomForest 训练 226 秒反而只有 0.7351。
-- **随机森林并不划算**：不仅精度低约 9 个点，训练还是 LinearSVC 的 30 倍、ExtraTrees 的 787 秒更是慢两个数量级。
+- **梯度提升树同样不划算**（XGBoost / LightGBM）：作为"更强的树模型"，二者精度仅 0.75~0.77，仍落后线性模型 5~7 个点；XGBoost 训练更要 1,426 秒（约 LinearSVC 的 200 倍）。LightGBM 因为直方图算法 + 叶子生长更快（377 秒），是树模型里性价比最高的，但依然不敌线性 SVM。
+- **树模型整体不划算**：不仅精度低约 5~9 个点，训练动辄数百秒到二十余分钟，均远慢于线性模型。
 - **朴素贝叶斯是"秒级"基线**：ComplementNB 用 0.1 秒拿到 0.8068，适合作为超低成本的兜底方案。
 - **LinearSVC 仍是精度与速度的最佳平衡点**，故作为部署首选。
 
@@ -203,6 +206,7 @@ text_classfication/
     ├── compare_tensors.py   三条张量策略效果对比脚本
     ├── compare_no_leak.py   无泄漏（分组划分）三策略对比脚本
     ├── compare_tfidf_clf.py TF-IDF + 多分类器横向对比脚本
+    ├── compare_tfidf_gbdt.py TF-IDF + 梯度提升树（XGBoost/LightGBM）对比脚本
     ├── leak_check.py        增强泄漏核查脚本
     ├── class.txt            标签表（一行一类，行号即 label id）
     ├── label_map.csv        标签映射（id, name, count）
