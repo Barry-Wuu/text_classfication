@@ -1,0 +1,60 @@
+{
+  "panel": [
+    "LinearSVC",
+    "SGD(hinge)",
+    "LogisticRegression",
+    "ComplementNB",
+    "MultinomialNB",
+    "kNN(cosine)"
+  ],
+  "per_model": {
+    "LinearSVC": {
+      "macro_f1": 0.8221,
+      "acc": 0.8229,
+      "fit_s": 3.11,
+      "infer_s": 0.01
+    },
+    "SGD(hinge)": {
+      "macro_f1": 0.8138,
+      "acc": 0.8157,
+      "fit_s": 1.48,
+      "infer_s": 0.0
+    },
+    "LogisticRegression": {
+      "macro_f1": 0.7866,
+      "acc": 0.8012,
+      "fit_s": 9.74,
+      "infer_s": 0.0
+    },
+    "ComplementNB": {
+      "macro_f1": 0.8068,
+      "acc": 0.8128,
+      "fit_s": 0.03,
+      "infer_s": 0.0
+    },
+    "MultinomialNB": {
+      "macro_f1": 0.7455,
+      "acc": 0.7779,
+      "fit_s": 0.03,
+      "infer_s": 0.01
+    },
+    "kNN(cosine)": {
+      "macro_f1": 0.6364,
+      "acc": 0.6531,
+      "fit_s": 0.8,
+      "infer_s": 7.21
+    }
+  },
+  "hard_voting": {
+    "macro_f1": 0.8048,
+    "acc": 0.8099
+  },
+  "soft_voting": {
+    "macro_f1": 0.7843,
+    "acc": 0.7954
+  },
+  "oracle_acc": 0.9028,
+  "disagree_rate": 0.3824,
+  "n_experts": 6,
+  "n_test": 1378
+}

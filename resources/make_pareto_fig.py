@@ -92,18 +92,24 @@ if pareto:
             zorder=2, label="帕累托最优边界")
 
 # 标注：按 x 排序后，相邻点交替上下偏移，减少碰撞
+# 标注：按 x 排序；给重叠密集区做多级垂直错位，减少碰撞
+def short(n):
+    return n.replace("LLM:", "").replace("(cosine)", "")
+
+
 order = sorted(pts, key=lambda x: x["t"])
 for i, p in enumerate(order):
     on = any(p is q for q in pareto)
     if on:
         xytext, va = (10, 6), "bottom"
     else:
-        up = (i % 2 == 0)
-        xytext = (9, 8 if up else -12)
-        va = "bottom" if up else "top"
-    ax.annotate(p["name"], (p["t"], p["f1"]),
+        # 以对数耗时分成若干列，同列内交替上下偏移
+        lev = i % 4
+        dy = [10, -14, 22, -26][lev]
+        xytext, va = (9, dy), ("bottom" if dy > 0 else "top")
+    ax.annotate(short(p["name"]), (p["t"], p["f1"]),
                 textcoords="offset points", xytext=xytext,
-                fontsize=9.5 if on else 8.6,
+                fontsize=9.6 if on else 8.4,
                 fontweight="bold" if on else "normal",
                 color="#111827" if on else "#475569", zorder=4,
                 ha="left", va=va)
@@ -133,7 +139,7 @@ ax.set_axisbelow(True)
 ax.margins(x=0.08, y=0.12)
 
 fig.text(0.5, 0.012,
-         "蓝=线性　橙=树模型　紫=fastText　红=大模型 API　绿=朴素贝叶斯　灰=kNN　"
+         "蓝=线性　橙=树模型　紫=fastText　红=大模型 API　绿=朴素贝叶斯　灰=kNN　青=集成(专家组)　"
          "　红点+虚线=帕累托最优前沿（不被任何方法支配）",
          ha="center", fontsize=9, color="#64748b")
 plt.tight_layout(rect=[0, 0.03, 1, 1])
