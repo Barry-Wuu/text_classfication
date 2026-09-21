@@ -1,0 +1,14 @@
+# 张量/中间产物（体积大，可现场重建，不入库）
+resources/*.npz
+resources/*.npy
+resources/*.pkl
+resources/*.pt
+
+# 评测输出（临时结果）
+eda/ab_result.txt
+eda/ab_speed_svm.txt
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

@@ -435,6 +435,6 @@ def preprocess(text: str, use_opencc: bool = False) -> str:
 上述 pipeline 已实现为 `preprocess.py`（与本文件同目录），可直接运行做批量清洗并输出对照报告：
 
 ```bash
-python eda/preprocess.py            # 只统计，不落盘
-python eda/preprocess.py --write    # 生成 clean.csv
+python resources/preprocess.py            # 只统计，不落盘
+python resources/preprocess.py --write    # 生成 clean.csv
 ```

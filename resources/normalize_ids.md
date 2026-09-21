@@ -1,6 +1,6 @@
 # 强标识符省流说明
 
-本文记录 `eda/normalize_ids.py` 的设计，以及它相对 `clean.csv` 做了什么。
+本文记录 `resources/normalize_ids.py` 的设计，以及它相对 `clean.csv` 做了什么。
 
 ## 一、为什么只省流"手机号 / 信用代码 / 订单号"
 
@@ -67,8 +67,8 @@
 ## 五、产物与用法
 
 ```
-python eda/normalize_ids.py            # 只统计，不落盘
-python eda/normalize_ids.py --write    # 生成 clean_ids.csv（项目根目录）
+python resources/normalize_ids.py            # 只统计，不落盘
+python resources/normalize_ids.py --write    # 生成 clean_ids.csv（项目根目录）
 ```
 
 - **`clean.csv`** —— 保守版：仅字符级清洗，标识符保留原样（含脱敏残留）。
