@@ -38,6 +38,8 @@ def cost(r):
 
 
 def color(n):
+    if "BERT" in n:
+        return "#db2777"          # BERT 微调 洋红
     if n.startswith("Ensemble"):
         return "#06b6d4"          # 集成(专家组) 青
     if n in ("LinearSVC", "SGD(hinge)", "LogisticRegression"):
@@ -141,7 +143,7 @@ ax.set_axisbelow(True)
 ax.margins(x=0.08, y=0.12)
 
 fig.text(0.5, 0.012,
-         "蓝=线性　橙=树模型　紫=fastText　红=大模型 API　绿=朴素贝叶斯　灰=kNN　青=集成(专家组)　"
+         "洋红=BERT 微调　蓝=线性　橙=树模型　紫=fastText　红=大模型 API　绿=朴素贝叶斯　灰=kNN　青=集成(专家组)　"
          "　红点+虚线=帕累托最优前沿（不被任何方法支配）",
          ha="center", fontsize=9, color="#64748b")
 plt.tight_layout(rect=[0, 0.03, 1, 1])

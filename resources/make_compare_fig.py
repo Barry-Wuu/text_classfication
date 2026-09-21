@@ -26,6 +26,8 @@ fit = [round((r.get("fit_s") or 0.0) + (r.get("infer_s") or 0.0), 2) for r in ro
 
 
 def color(n):
+    if "BERT" in n:
+        return "#db2777"          # BERT 微调 洋红
     if n.startswith("Ensemble"):
         return "#06b6d4"          # 集成(专家组) 青
     if n in ("LinearSVC", "SGD(hinge)", "LogisticRegression"):
@@ -66,11 +68,13 @@ ax.set_axisbelow(True)
 ax = axes[1]
 ax.set_facecolor(BG)
 order_t = sorted(range(len(names)), key=lambda i: fit[i])          # 耗时升序
-y_t = [len(order_t) - 1 - pos for pos, i in enumerate(order_t)]    # 最短在顶端
-bars = ax.barh([y_t[i] for i in range(len(names))], fit,
-               color=[color(names[i]) for i in range(len(names))],
+ypos = [0] * len(names)
+for pos, i in enumerate(order_t):
+    ypos[i] = len(names) - 1 - pos                                 # 最短的在顶端
+bars = ax.barh(ypos, fit,
+               color=[color(n) for n in names],
                edgecolor="#334155", linewidth=0.6)
-ax.set_yticks(y_t); ax.set_yticklabels([names[i] for i in range(len(names))])
+ax.set_yticks(ypos); ax.set_yticklabels(names)
 ax.set_xscale("log")
 ax.set_xlabel("耗时（秒，对数轴）")
 ax.set_title("耗时（本地模型=训练+推理；大模型 API=全量推理，按耗时升序）", fontsize=12, fontweight="bold")
@@ -83,7 +87,7 @@ ax.set_axisbelow(True)
 
 fig.suptitle(f"消费者投诉文本分类 · {len(names)} 个方法横向对比", fontsize=15, fontweight="bold", y=0.99)
 fig.text(0.5, 0.005,
-         "蓝=线性模型　橙=树模型　紫=fastText　红=大模型 API　绿=朴素贝叶斯　灰=kNN　青=集成(专家组)（同一无泄漏划分）",
+         "洋红=BERT 微调　蓝=线性模型　橙=树模型　紫=fastText　红=大模型 API　绿=朴素贝叶斯　灰=kNN　青=集成(专家组)（同一无泄漏划分）",
          ha="center", fontsize=9, color="#64748b")
 plt.tight_layout(rect=[0, 0.03, 1, 0.96])
 

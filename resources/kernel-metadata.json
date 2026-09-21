@@ -1,0 +1,14 @@
+{
+  "id": "wubarry/textcls-bert-finetune",
+  "title": "textcls bert finetune",
+  "code_file": "compare_bert_finetune.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "is_internet_enabled": true,
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": []
+}

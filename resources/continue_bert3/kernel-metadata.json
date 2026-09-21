@@ -1,0 +1,18 @@
+{
+  "id": "wubarry/textcls-bert-continue3",
+  "title": "textcls bert continue3",
+  "code_file": "compare_bert_continue.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "enable_tpu": false,
+  "keywords": [],
+  "dataset_sources": [],
+  "kernel_sources": [
+    "wubarry/textcls-bert-continue2"
+  ],
+  "competition_sources": [],
+  "model_sources": []
+}
