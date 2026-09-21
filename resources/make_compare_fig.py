@@ -23,12 +23,14 @@ names = [r["name"] for r in rows]
 f1 = [r["macro_f1"] for r in rows]
 fit = [r["fit_s"] for r in rows]
 
-# 颜色：线性模型蓝、树模型橙、贝叶斯绿、kNN 灰
+# 颜色：线性模型蓝、树模型橙、贝叶斯绿、kNN 灰、fastText 紫
 def color(n):
     if n in ("LinearSVC", "SGD(hinge)", "LogisticRegression"):
         return "#3b82f6"
     if n in ("RandomForest", "ExtraTrees", "XGBoost", "LightGBM"):
         return "#f59e0b"
+    if n == "fastText":
+        return "#8b5cf6"
     if "NB" in n:
         return "#10b981"
     return "#9ca3af"
@@ -67,9 +69,9 @@ for b, v in zip(bars, fit):
 ax.grid(axis="x", ls=":", alpha=0.4)
 ax.set_axisbelow(True)
 
-fig.suptitle("消费者投诉文本分类 · 10 个分类器横向对比", fontsize=15, fontweight="bold", y=0.99)
+fig.suptitle("消费者投诉文本分类 · 11 个分类器横向对比", fontsize=15, fontweight="bold", y=0.99)
 fig.text(0.5, 0.005,
-         "蓝=线性模型　橙=树模型　绿=朴素贝叶斯　灰=kNN（同一份 25,251 维 TF-IDF，按源 id 分组无泄漏划分）",
+         "蓝=线性模型　橙=树模型　紫=fastText　绿=朴素贝叶斯　灰=kNN（同一无泄漏划分；fastText 用同一训练/测试集）",
          ha="center", fontsize=9, color="#64748b")
 plt.tight_layout(rect=[0, 0.03, 1, 0.96])
 
