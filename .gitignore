@@ -7,6 +7,7 @@ resources/*.pt
 # 评测输出（临时结果）
 eda/ab_result.txt
 eda/ab_speed_svm.txt
+resources/tfidf_clf_result.json
 
 # Python
 __pycache__/
