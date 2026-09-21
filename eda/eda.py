@@ -192,13 +192,18 @@ def fig_all_length_hist(rows, out):
     mean = statistics.mean(lens)
     med = statistics.median(lens)
 
-    fig, ax = plt.subplots(figsize=(11, 6))
-    ax.hist(lens, bins=50, color=CLR_ALL, alpha=0.75, edgecolor="white")
+    # 每个整数长度对应一根柱子（不合并区间）
+    lo, hi = min(lens), max(lens)
+    bins = list(range(lo, hi + 2))
+
+    fig, ax = plt.subplots(figsize=(13, 6))
+    ax.hist(lens, bins=bins, color=CLR_ALL, alpha=0.85, edgecolor="white", linewidth=0.3)
     ax.axvline(mean, color="red", ls="--", lw=2, label=f"均值 = {mean:.0f}")
     ax.axvline(med, color="blue", ls="-.", lw=2, label=f"中位数 = {med:.0f}")
-    ax.set_title("全部样本长度分布（字符数）", fontsize=14)
+    ax.set_title("全部样本长度分布（每字符一根柱）", fontsize=14)
     ax.set_xlabel("文本长度（字符）", fontsize=11)
     ax.set_ylabel("样本数量", fontsize=11)
+    ax.set_xlim(lo - 1, hi + 1)
     ax.legend()
     ax.grid(axis="y", ls="--", alpha=0.4)
     fig.savefig(out)
@@ -255,14 +260,17 @@ def fig_orig_vs_aug(rows, out):
 
     fig, axes = plt.subplots(1, 2, figsize=(13, 5.5))
 
-    # 左：长度分布对比（直方图叠加）
+    # 左：长度分布对比（每个整数长度一根柱子）
     ax = axes[0]
-    bins = list(range(0, 300, 10))
-    ax.hist(orig, bins=bins, color=CLR_MAIN, alpha=0.6, label=f"原始 (n={len(orig)})")
-    ax.hist(aug, bins=bins, color=CLR_AUG, alpha=0.6, label=f"增强 (n={len(aug)})")
-    ax.set_title("原始 vs 增强：长度分布", fontsize=13)
+    lo = min(min(orig), min(aug))
+    hi = max(max(orig), max(aug))
+    bins = list(range(lo, hi + 2))
+    ax.hist(orig, bins=bins, color=CLR_MAIN, alpha=0.65, label=f"原始 (n={len(orig)})")
+    ax.hist(aug, bins=bins, color=CLR_AUG, alpha=0.65, label=f"增强 (n={len(aug)})")
+    ax.set_title("原始 vs 增强：长度分布（每字符一根柱）", fontsize=13)
     ax.set_xlabel("文本长度（字符）", fontsize=11)
     ax.set_ylabel("样本数量", fontsize=11)
+    ax.set_xlim(lo - 1, hi + 1)
     ax.legend()
     ax.grid(axis="y", ls="--", alpha=0.4)
 
