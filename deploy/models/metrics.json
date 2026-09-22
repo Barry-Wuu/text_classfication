@@ -1,0 +1,22 @@
+{
+ "protocol": "GroupShuffleSplit(test_size=0.2, random_state=42)",
+ "train": 23852,
+ "test": 1378,
+ "tfidf": {
+  "tokenizer": "jieba_cut.cut",
+  "min_df": 2,
+  "n_features": 25251
+ },
+ "metrics": {
+  "complementnb": {
+   "acc": 0.8128,
+   "macro_f1": 0.8068,
+   "size_mb": 3.5
+  },
+  "sgd_hinge": {
+   "acc": 0.8157,
+   "macro_f1": 0.8138,
+   "size_mb": 1.48
+  }
+ }
+}

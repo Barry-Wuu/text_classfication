@@ -16,3 +16,6 @@ __pycache__/
 
 # WorkBuddy 会话工作数据（项目内保留，不入库）
 .workbuddy/
+
+# 部署用量化权重（体积大，走 GitHub Release 分发）
+deploy/models/*.pt

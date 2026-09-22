@@ -585,7 +585,142 @@ BERT（`bert-base-chinese`，12 层、约 1.1 亿参数）在 Kaggle 云端 GPU 
 
 ---
 
-## 六、仓库结构
+## 六、大模型 API 调用与提示词设计
+
+项目里 9 个大模型 API 方法分三类调用方式，提示词也按"要不要一次判多条"设计成三套。以下为实际使用的提示词与解析规则（源码见 `resources/compare_openrouter.py`、`compare_llm_batch.py`、`compare_jev.py`）。
+
+**类别清单**（18 类，三套提示词共用同一份顺序）
+
+> 共享出行 / 医疗健康 / 婚恋交友 / 家居日用 / 影音娱乐 / 房产家装 / 教育 / 数码3C / 旅游出行 / 服饰鞋包 / 本地生活 / 母婴食品 / 汽车 / 游戏 / 物流快递 / 电商平台 / 通讯运营商 / 金融支付
+
+### 6.1 单条判定（OpenRouter 免费池等）
+
+系统提示词要求"只输出类名本身"，用户提示词按"候选类别 + 投诉文本 + 指令"三段式拼装：
+
+```python
+SYS = ("你是中文消费投诉文本分类助手。用户给出一条投诉文本和一个候选类别列表，"
+       "你必须从中选出唯一最合适的一个类别，只输出该类别的名称本身，"
+       "不要输出任何标点、解释或多余文字。")
+
+USER_TPL = ("候选类别（只能选一个）：\n{cats}\n\n"
+            "投诉文本：\n{text}\n\n"
+            "请只输出最合适的一个类别名。")
+```
+
+要点：`temperature=0` 保证可复现；`max_tokens=512` 足够放下一个类名；输出侧不信任模型——解析时先精确命中类名，再退化为子串命中，都不中才算错。
+
+### 6.2 批量打包（商汤 SenseNova / 云知声 / OpenRouter batch）
+
+把 64～128 条文本塞进一次请求，要求模型返回"序号 → 类名"的 JSON，把请求数从 1,378 次压到 11～22 次：
+
+```python
+BATCH_SYS = "你是中文消费投诉文本分类助手，需要为一批文本逐条选出唯一最合适的类别。"
+
+BATCH_USER_TPL = ("候选类别（每条只能选一个，必须严格照抄类别名）：\n{cats}\n\n"
+                  "请为下面每条投诉文本分类，只输出一个 JSON 对象，键为文本序号（从 1 开始），"
+                  "值为类别名，不要输出任何解释或多余文字：\n{items}\n\n"
+                  '只输出 JSON，例如：{{"1": "电商平台", "2": "物流快递"}}')
+```
+
+四条约定的原因：
+
+- **键从 1 开始且值必须严格照抄类名**：降低模型自创类名（如"电子数码"）的概率，也让解析能直接按类名精确匹配，不必做模糊归类；
+- **给一个 JSON 例子**：比只说"输出 JSON"稳得多，尤其是小模型；
+- **解析先剥代码块**：模型常把 JSON 包在 ```json 围栏里，解析前先用正则剥掉围栏再 `json.loads`；解析失败的条目单独记 `fail` 计数（5.5 表里的 `4fail` / `5fail` 就是这些）；
+- **关闭思考链**：免费池与国内平台里不少是思考模型，不关会把 token 全烧在 reasoning 上、`content` 返回空。对应参数是 OpenRouter `reasoning.enabled=false`、商汤 `reasoning_effort=none`、云知声 `thinking=disabled`。
+
+### 6.3 结构化 Choice（TypeSafe Jev）
+
+Jev 不用自然语言提示词，而是把分类写成 JSON Schema 里的 `choice` 原语，由模型直接返回选项与置信度，省掉"模型自由发挥文本 → 再解析"的不确定性：
+
+```python
+"category": {
+    "type": "choice",
+    "instructions": "这条消费者投诉属于下面哪一个消费领域",
+    "criteria": CRITERIA,          # 18 个中文类名，作为枚举候选
+}
+```
+
+返回 `choice`（选中的类名）+ `confidence`，无需文本解析；代价是精度依赖模型本身（本任务 0.7327）。
+
+### 6.4 三套提示词的效果对照
+
+| 调用方式 | 代表方法 | 全量耗时 | macro-F1 | 结论 |
+| --- | --- | ---: | ---: | --- |
+| 单条判定 | Jev（Choice 原语） | 85.7s | 0.7327 | 结构化输出无需解析，精度仍是 LLM 里最高的一档 |
+| 批量 128 | nex-n2.5-pro（OpenRouter 免费） | 74.8s | 0.7272 | 单请求判 1,378 条，免费额度下最实用的形态 |
+| 批量 64 | glm-5.2（商汤） | 246.5s | 0.7242 | 稳定返回 JSON，速度受平台侧影响 |
+| 批量 64 | u2-flash（云知声） | 31.2s | 0.7025 | 30 秒跑完全量，最快的一档 |
+
+结论：**提示词能把自由文本输出变得可解析可复现，但补不齐封闭词表加细粒度这个任务短板**——9 个 API 方法整体落在 0.65～0.73，比 TF-IDF + 线性 SVM 低 9～17 个点。提示词工程在这里的收益是"让 LLM 的输出稳定可用"，而不是"让 LLM 更准"。
+
+## 七、模型部署
+
+三种部署方式都跑同一份模型注册表（`deploy/model_registry.py`），页面统一支持**三个帕累托最优模型任选**、输出 **Top5 类别 + 概率**并显示**响应时间**：
+
+| 方式 | 文件 | 适用场景 | 启动 |
+| --- | --- | --- | --- |
+| Flask | `deploy/app_flask.py` | 交付演示主页面（改造自 `投满分.ipynb` 的 Flask 单元） | `cd deploy && python app_flask.py 8800` |
+| Streamlit | `deploy/app_streamlit.py` | 十分钟内先跑起来的交互页 | `cd deploy && streamlit run app_streamlit.py` |
+| FastAPI | `deploy/app_fastapi.py` | 服务化 / 给别的系统调用（自带 `/docs` 接口文档） | `cd deploy && python app_fastapi.py 8801` |
+
+### 7.1 页面能力
+
+- **模型可切换**：ComplementNB / SGD（hinge）/ BERT-NF4 4bit 三个前沿模型；每张模型卡上标注设备（CPU/GPU）、macro-F1 与体积。**环境不支持的模型置灰并写出原因**（如"本机无 CUDA"），绝不静默替换成别的模型。
+- **Top5 概率**：横向概率条 + 百分比，第一位加粗。
+- **响应时间**：服务端推理耗时与浏览器往返耗时分别显示（讲义要求的"记录响应时间"）。
+- **清空按钮**、字数计数（≤500 字）、Ctrl+Enter 快捷预测、示例标签一键填入。
+- **分享式演示链接**：`/?model=sgd_hinge&demo=文本&auto=1` 打开即预填并自动预测（截图就是这么取到的）。
+
+### 7.2 展示效果
+
+页面默认态（四个模型卡，其中 GPU 版在本机置灰）：
+
+![部署页面默认态](resources/figures/deploy_01_page.png)
+
+SGD（hinge）预测结果（Top5 + 概率 + 响应时间）：
+
+![SGD 预测结果](resources/figures/deploy_02_result_sgd.png)
+
+BERT-INT8 动态量化在纯 CPU 上的预测结果：
+
+![BERT-INT8 预测结果](resources/figures/deploy_03_result_bert_int8.png)
+
+读图要点：**概率不是校准过的置信度**。ComplementNB 的 Top1 常在 10%～20%（朴素贝叶斯的概率输出偏平），SGD（hinge）本身没有 `predict_proba`，页面用的是 OvR `decision_function` 经 softmax 的近似值——排序可用，绝对值别当真。BERT 系列是正常 softmax，概率分布更陡。
+
+### 7.3 模型下载
+
+| 文件 | 大小 | 设备要求 | 下载 |
+| --- | ---: | --- | --- |
+| `bert_nf4_state.pt`（NF4 4bit 量化，F1 0.8590） | 108.2 MB | GPU + bitsandbytes | [下载](https://github.com/Barry-Wuu/text_classfication/releases/download/deploy-models/bert_nf4_state.pt) |
+| `bert_int8_state.pt`（INT8 动态量化，F1 0.8518） | 145.6 MB | 纯 CPU | [下载](https://github.com/Barry-Wuu/text_classfication/releases/download/deploy-models/bert_int8_state.pt) |
+| `deploy_models_meta.json`（加载说明与指标） | 2 KB | — | [下载](https://github.com/Barry-Wuu/text_classfication/releases/download/deploy-models/deploy_models_meta.json) |
+| 原版 BERT 微调权重 `bert_epoch59.pt`（F1 0.8660，教师模型） | 390.3 MB | GPU | [下载](https://github.com/paixiaoxin66/text_classfication/releases/download/bert-weights/bert_epoch59.pt) |
+| 两个非 BERT 模型（ComplementNB / SGD(hinge)） | 5.2 MB | 纯 CPU | 随仓库提供：`deploy/models/` |
+
+**下载后的放置方式**
+
+```
+deploy/models/                     # 量化权重放这里，注册表会自动识别
+├── bert_nf4_state.pt              # 需自行下载（108.2 MB）
+├── bert_int8_state.pt             # 需自行下载（145.6 MB）
+├── tfidf_vectorizer.joblib        # 仓库自带
+├── complementnb.joblib            # 仓库自带
+├── sgd_hinge.joblib               # 仓库自带
+├── labels.json                    # 仓库自带（18 类顺序）
+└── metrics.json                   # 仓库自带（两个非 BERT 模型的回测指标）
+```
+
+量化权重也可放别处，用环境变量指定：`set DEPLOY_MODEL_DIR=D:\models\deploy`。BERT 基座默认取 `D:\models\bert-base-chinese`，可用 `BASE_BERT` 覆盖。
+
+### 7.4 部署注意事项
+
+- **NF4 只能 GPU 而 INT8 只能 CPU**：这是 PyTorch / bitsandbytes 的硬限制，不是实现取舍；注册表据此做可用性探测，页面把不可用模型置灰。
+- **首次调用偏慢**：jieba 首次加载词典约 0.8s、BERT 首次加载权重数秒；之后 ComplementNB / SGD 在毫秒级（见截图的"服务端 4.24 ms"）。
+- **两个非 BERT 模型随仓库分发**，量化权重走 Release——仓库单文件上限 100MB，388MB 级的权重必须走 Release 附件。
+- **模型不可用时页面报错而不是降级**：宁可让用户看到"该模型不可用"，也不要用别的模型冒充结果。
+
+## 八、仓库结构
 
 ```
 text_classfication/
@@ -593,6 +728,15 @@ text_classfication/
 ├── train_augmented.csv      训练数据（30,000 条，18 类，含规则增强字段）
 ├── clean.csv                字符级清洗后的数据（text, category 两列）
 ├── labeled.csv              清洗 + 整数标签（text, category, label 三列）
+├── deploy/                  模型部署（Flask / Streamlit / FastAPI）
+│   ├── model_registry.py    模型注册表：统一 Top5 预测接口与可用性探测
+│   ├── page_html.py         页面模板（改造自 投满分.ipynb 的 Flask 内嵌页）
+│   ├── app_flask.py         Flask 版（主页面）
+│   ├── app_streamlit.py     Streamlit 版
+│   ├── app_fastapi.py       FastAPI 版（含 /docs）
+│   ├── jieba_cut.py         模块级分词函数（供 joblib 序列化引用）
+│   ├── train_export_models.py 训练并导出两个非 BERT 模型
+│   └── models/              部署用模型（joblib 小模型 + 量化权重放置位）
 ├── eda/                     探索性数据分析
 │   ├── eda.py               分析脚本（matplotlib + jieba + wordcloud）
 │   ├── EDA.md               分析报告与结论
@@ -640,11 +784,11 @@ text_classfication/
     ├── class.txt            标签表（一行一类，行号即 label id）
     ├── label_map.csv        标签映射（id, name, count）
     ├── vocab.txt            词表（一行一词，行号即 id）
-    ├── figures/             建模对比图（09_model_compare.png、10_pareto.png、11_bert_loss.png、12_bert_acc.png、13~16 四个代表模型的 18 阶混淆矩阵、17~18 标签质量韦恩图、19 模型压缩四方案对比）
+    ├── figures/             建模对比图（09_model_compare.png、10_pareto.png、11_bert_loss.png、12_bert_acc.png、13~16 四个代表模型的 18 阶混淆矩阵、17~18 标签质量韦恩图、19 模型压缩四方案对比、deploy_0x 部署页面效果）
     ├── PREPROCESS.md        预处理报告
     └── TENSOR.md            标签表、张量策略与建模结论报告
 ```
 
-## 七、参与方式
+## 九、参与方式
 
 项目采用分支协作：成员各自在独立分支开发，通过 Pull Request 合并到 `main`。提交前请确保数据处理与评估脚本可复现，并在描述中说明改动范围与验证结果。
