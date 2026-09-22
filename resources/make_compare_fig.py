@@ -18,7 +18,9 @@ OUT = os.path.join(RES, "figures")
 os.makedirs(OUT, exist_ok=True)
 
 d = json.load(open(os.path.join(RES, "tfidf_clf_result.json"), encoding="utf-8"))
-rows = d["rows"]
+# 数据源是各评测脚本"旧行保留 + 新行追加"分批累出来的, 行序等于采集批次,
+# 不是排名; 这里统一按 macro-F1 降序再画, 保证图与 README 5.5 的表格同序。
+rows = sorted(d["rows"], key=lambda r: -r["macro_f1"])
 names = [r["name"] for r in rows]
 f1 = [r["macro_f1"] for r in rows]
 # 统一耗时口径：本地模型取训练 + 推理；大模型 API 取全量推理墙钟时间
