@@ -1,0 +1,19 @@
+训练 23852（原始 5508 + 增强 18344）/ 测试 1378（全原始）；测试源 1378 个
+TF-IDF dim=25251 nnz=1390460 用时 20.8s
+转稠密 (23852, 25251) 用时 4.1s
+  [专家 1] LinearSVC          macroF1=0.8221 acc=0.8229 训练=3.1s 推理=0.0s
+  [专家 2] SGD(hinge)         macroF1=0.8138 acc=0.8157 训练=1.5s 推理=0.0s
+  [专家 3] LogisticRegression macroF1=0.7866 acc=0.8012 训练=9.7s 推理=0.0s
+  [专家 4] ComplementNB       macroF1=0.8068 acc=0.8128 训练=0.0s 推理=0.0s
+  [专家 5] MultinomialNB      macroF1=0.7455 acc=0.7779 训练=0.0s 推理=0.0s
+  [专家 6] kNN(cosine)        macroF1=0.6364 acc=0.6531 训练=0.8s 推理=7.2s
+
+有效专家 6 位： ['LinearSVC', 'SGD(hinge)', 'LogisticRegression', 'ComplementNB', 'MultinomialNB', 'kNN(cosine)']
+
+=== 集成结果 ===
+  硬投票 HardVoting   macroF1=0.8048 acc=0.8099 投票耗时=0.001s
+  软投票 SoftVoting   macroF1=0.7843 acc=0.7954 投票耗时=0.000s
+  理论上限 oracle(任一专家对) acc=0.9028 （=若完美挑选专家可达的准确率上限）
+  专家分歧率（样本级）= 0.3824（527/1378 条至少两位专家意见不同）
+已写: D:\text_classfication\resources\tfidf_clf_result.json
+已写诊断: D:\text_classfication\resources\ensemble_diag.json

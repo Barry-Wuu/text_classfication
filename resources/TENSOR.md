@@ -83,7 +83,7 @@ jieba 分词 → 词频统计 → 构建词表（`<pad>=0`、`<unk>=1`，过滤�
 
 ### 3.3 TF-IDF 之上换分类器：多算法横向对比
 
-同一份 TF-IDF 特征（jieba 分词 + 词频，`min_df=2`，25,251 维）+ 同一无泄漏划分，横向比 12 个方法（fastText 用同一训练/测试集自行分词；Jev 直接对测试文本调大模型 API）。脚本：`resources/compare_tfidf_clf.py`、`resources/compare_tfidf_gbdt.py`、`resources/compare_fasttext.py`、`resources/compare_jev.py`（本机 CPU；Jev 走网络 API）。
+同一份 TF-IDF 特征（jieba 分词 + 词频，`min_df=2`，25,251 维）+ 同一无泄漏划分，横向比 16 个方法（fastText 用同一训练/测试集自行分词；Jev 直接对测试文本调大模型 API；4 个 OpenRouter 免费模型走批量打包调用）。脚本：`resources/compare_tfidf_clf.py`、`resources/compare_tfidf_gbdt.py`、`resources/compare_fasttext.py`、`resources/compare_jev.py`、`resources/compare_openrouter.py`（本机 CPU；API 方法走网络）。
 
 | 方法 | macro-F1 | 准确率 | 耗时 |
 |---|---:|---:|---:|
@@ -98,7 +98,11 @@ jieba 分词 → 词频统计 → 构建词表（`<pad>=0`、`<unk>=1`，过滤�
 | MultinomialNB | 0.7455 | 0.7779 | 0.1s（训练） |
 | RandomForest | 0.7351 | 0.7518 | 226s（训练） |
 | Jev（大模型 API） | 0.7327 | 0.7351 | 85.7s（1378 条推理总耗时） |
+| nex-n2.5-pro（OpenRouter 免费） | 0.7272 | 0.7380 | 74.8s（批量 128） |
+| nemotron-3-ultra-550b-a55b（OpenRouter 免费） | 0.7253 | 0.7316 | 121.2s（批量 128） |
 | kNN（cosine） | 0.6364 | 0.6531 | 0.4s（训练） |
+| nemotron-3-super-120b-a12b（OpenRouter 免费） | 0.6582 | 0.6718 | 70.5s（批量 128） |
+| dots-3-note-preview（OpenRouter 免费） | 0.6550 | 0.6773 | 33.8s（批量 128） |
 
 结论：
 
@@ -106,6 +110,7 @@ jieba 分词 → 词频统计 → 构建词表（`<pad>=0`、`<unk>=1`，过滤�
 - **梯度提升树同样不划算**（XGBoost / LightGBM）：作为"更强的树模型"，二者精度仅 0.75～0.77，仍落后线性模型 5～7 个点；XGBoost 训练要 1,426 秒（约 LinearSVC 的 200 倍），LightGBM 因直方图算法 + 叶子生长更快（377 秒）但仍不敌线性 SVM。
 - **fastText 表现中游**（0.7687）：36 秒训练，优于全部树模型，但比线性 SVM 低约 5 个点。原因在于本文本的关键信号集中在少数强判别词（品牌/业务词），词袋线性模型已能充分捕捉，fastText 的 n-gram 子词与浅层嵌入未带来额外收益。
 - **大模型 API 未占优**（Jev 0.7327）：Jev 是 TypeSafe 的 System One 模型，用 Choice 原语把 18 个类名作为候选项做结构化分类，返回判定与置信度（平均置信 0.914），无需训练数据。但全量 1378 条上仅 0.7327，低于线性 SVM 约 9 个点、略高于随机森林；优势在于零训练、开箱即用，而非精度。
+- **OpenRouter 免费池追平国产 API 但仍未进入第一梯队**（0.6550～0.7272）。4 个免费模型中 nex-n2.5-pro（0.7272）与 nemotron-3-ultra-550b-a55b（0.7253）已与商汤 glm-5.2（0.7242）同档，且全量 1,378 条推理只用 74.8s / 121.2s；而 nemotron-3-super-120b-a12b（0.6582）与 dots-3-note-preview（0.6550）掉到 0.65～0.66，低于全部国产 API 方法。共同点是仍低于线性 SVM 约 9～17 个点，故"免费大模型开箱即用"在精度上依旧换不来收益。调用要点：免费额度按请求条数计（free tier 每日 50 次），须用 128 条/批的打包请求（11 次/模型），并加 `reasoning.enabled=false` 关闭思考链，否则思考模型正文为空、判定全废。
 - **朴素贝叶斯是秒级兜底**：ComplementNB 仅 0.1 秒即得 0.8068。
 
 ### 3.4 结论与部署推荐
@@ -141,6 +146,6 @@ BERT（`bert-base-chinese`）在 Kaggle GPU 上按抽样协议微调：每个 ep
 | 训练损失曲线 | `resources/figures/11_bert_loss.png` | 损失 2.64 快速跌至 0.5 以内（前 8 轮），20 轮后贴地并于 0.01～0.07 抖动——预训练表征已含任务知识，后期降损不再换来泛化 |
 | 训练/测试准确率 | `resources/figures/12_bert_acc.png` | 训练准确率爬到 98.1%、后 40 轮贴 99%～100%；测试准确率第 30 轮后停在 84%～86% 平台，末轮张口 15.1 个点。抽样带来的随机梯度噪声把过拟合推后，是"抽样而非整份训练"的价值 |
 
-前 100 轮中测试准确率最高为 **epoch 59（0.8628 / macro-F1 0.8660）**，其权重 `bert_epoch59.pt` 已作为打榜模型（若按 macro-F1 选，最优是 epoch 86 的 0.8685，但该轮权重已被滚动保存策略删除）。逐轮曲线与选模依据见 GitHub Release `bert-weights` 附件 `bert_best100.json`。
+前 100 轮中测试准确率最高为 **epoch 59**（0.8628 / macro-F1 0.8660），其权重 `bert_epoch59.pt` 已作为打榜模型（若按 macro-F1 选，最优是 epoch 86 的 0.8685，但该轮权重已被滚动保存策略删除）。逐轮曲线与选模依据见 GitHub Release `bert-weights` 附件 `bert_best100.json`。
 
 
