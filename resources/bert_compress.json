@@ -1,0 +1,111 @@
+{
+ "results": {
+  "教师BERT fp32-CPU": {
+   "acc": 0.8628,
+   "macro_f1": 0.866,
+   "size_mb": 390.2,
+   "ms_per_sample": 217.51,
+   "note": "基准(CPU)"
+  },
+  "INT8动态量化(CPU)": {
+   "acc": 0.8483,
+   "macro_f1": 0.8518,
+   "size_mb": 145.6,
+   "ms_per_sample": 169.41,
+   "note": "quantize_dynamic Linear->qint8"
+  },
+  "教师BERT fp32": {
+   "acc": 0.8628,
+   "macro_f1": 0.866,
+   "size_mb": 390.3,
+   "ms_per_sample": 6.6,
+   "note": "基准(GPU)"
+  },
+  "NF4 4bit量化(GPU)": {
+   "acc": 0.857,
+   "macro_f1": 0.859,
+   "size_mb": 108.1,
+   "ms_per_sample": 2.09,
+   "note": "bnb NF4, encoder Linear 4bit"
+  },
+  "剪枝30%(非结构化)": {
+   "acc": 0.8541,
+   "macro_f1": 0.8595,
+   "size_mb": 390.3,
+   "ms_per_sample": 6.94,
+   "note": "global_unstructured L1, 实测稀疏度0.300, 逻辑剪枝体积不变"
+  },
+  "剪枝30%(CPU)": {
+   "size_mb": 390.2,
+   "ms_per_sample": 130.22,
+   "note": "CPU延迟对照"
+  },
+  "剪枝50%(非结构化)": {
+   "acc": 0.7627,
+   "macro_f1": 0.7704,
+   "size_mb": 390.3,
+   "ms_per_sample": 8.21,
+   "note": "global_unstructured L1, 实测稀疏度0.500, 逻辑剪枝体积不变"
+  },
+  "蒸馏LSTM学生 128维(8轮)": {
+   "acc": 0.73,
+   "macro_f1": 0.6923,
+   "size_mb": 11.3,
+   "ms_per_sample": 0.04,
+   "note": "T=2 a=0.7 全量23852条x8轮, GPU延迟",
+   "train_s": 25.3
+  },
+  "蒸馏LSTM学生 128维(8轮)-CPU": {
+   "size_mb": 11.3,
+   "ms_per_sample": 0.82,
+   "note": "CPU延迟对照"
+  },
+  "蒸馏LSTM学生 128维+INT8(CPU)": {
+   "acc": 0.7293,
+   "macro_f1": 0.6922,
+   "size_mb": 10.6,
+   "ms_per_sample": 0.7,
+   "note": "LSTM/Linear 量化, Embedding 保留 fp32"
+  },
+  "蒸馏LSTM学生 256维(20轮)": {
+   "acc": 0.8077,
+   "macro_f1": 0.8083,
+   "size_mb": 24.7,
+   "ms_per_sample": 0.11,
+   "note": "T=2 a=0.7 全量23852条x20轮(256维学生), GPU延迟",
+   "train_s": 151.7
+  },
+  "蒸馏LSTM学生 256维(20轮)-CPU": {
+   "size_mb": 24.7,
+   "ms_per_sample": 2.15,
+   "note": "CPU延迟对照"
+  },
+  "蒸馏LSTM学生 256维+INT8(CPU)": {
+   "acc": 0.8062,
+   "macro_f1": 0.8069,
+   "size_mb": 21.7,
+   "ms_per_sample": 2.17,
+   "note": "LSTM/Linear 量化, Embedding 保留 fp32"
+  }
+ },
+ "sources": {
+  "教师BERT fp32-CPU": "wubarry/textcls-cmp-int8",
+  "INT8动态量化(CPU)": "wubarry/textcls-cmp-int8",
+  "教师BERT fp32": "wubarry/textcls-cmp-kd3",
+  "NF4 4bit量化(GPU)": "wubarry/textcls-cmp-nf4",
+  "剪枝30%(非结构化)": "wubarry/textcls-cmp-prune",
+  "剪枝30%(CPU)": "wubarry/textcls-cmp-prune",
+  "剪枝50%(非结构化)": "wubarry/textcls-cmp-prune",
+  "蒸馏LSTM学生 128维(8轮)": "wubarry/textcls-cmp-kd2",
+  "蒸馏LSTM学生 128维(8轮)-CPU": "wubarry/textcls-cmp-kd2",
+  "蒸馏LSTM学生 128维+INT8(CPU)": "wubarry/textcls-cmp-kd2",
+  "蒸馏LSTM学生 256维(20轮)": "wubarry/textcls-cmp-kd3",
+  "蒸馏LSTM学生 256维(20轮)-CPU": "wubarry/textcls-cmp-kd3",
+  "蒸馏LSTM学生 256维+INT8(CPU)": "wubarry/textcls-cmp-kd3"
+ },
+ "meta": {
+  "n_test": 1378,
+  "batch": 128,
+  "max_len": 128
+ }
+}

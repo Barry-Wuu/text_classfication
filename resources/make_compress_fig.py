@@ -36,16 +36,22 @@ def get(name, key):
 
 # 展示顺序与设备标注（名称, 设备, 颜色）
 ITEMS = [
-    ("教师BERT fp32",      "GPU", "#d946ef"),
-    ("NF4 4bit量化(GPU)",  "GPU", "#3b82f6"),
-    ("剪枝30%(非结构化)",  "GPU", "#f59e0b"),
-    ("剪枝50%(非结构化)",  "GPU", "#f59e0b"),
-    ("教师BERT fp32-CPU",  "CPU", "#d946ef"),
-    ("INT8动态量化(CPU)",  "CPU", "#3b82f6"),
-    ("蒸馏4层学生 fp32",   "GPU", "#10b981"),
-    ("蒸馏4层学生 INT8(CPU)", "CPU", "#10b981"),
+    ("教师BERT fp32",            "GPU", "#d946ef"),
+    ("NF4 4bit量化(GPU)",        "GPU", "#3b82f6"),
+    ("剪枝30%(非结构化)",         "GPU", "#f59e0b"),
+    ("剪枝50%(非结构化)",         "GPU", "#f59e0b"),
+    ("蒸馏LSTM学生 256维(20轮)",   "GPU", "#10b981"),
+    ("蒸馏LSTM学生 128维(8轮)",    "GPU", "#10b981"),
+    ("教师BERT fp32-CPU",        "CPU", "#d946ef"),
+    ("INT8动态量化(CPU)",         "CPU", "#3b82f6"),
+    ("剪枝30%(CPU)",             "CPU", "#f59e0b"),
+    ("蒸馏LSTM学生 256维(20轮)-CPU", "CPU", "#10b981"),
+    ("蒸馏LSTM学生 256维+INT8(CPU)", "CPU", "#10b981"),
+    ("蒸馏LSTM学生 128维(8轮)-CPU", "CPU", "#10b981"),
+    ("蒸馏LSTM学生 128维+INT8(CPU)", "CPU", "#10b981"),
 ]
-items = [(n, dev, c) for n, dev, c in ITEMS if get(n, "macro_f1") is not None]
+items = [(n, dev, c) for n, dev, c in ITEMS if get(n, "macro_f1") is not None
+         or (get(n, "ms_per_sample") is not None and get(n, "size_mb") is not None)]
 print("可用方案:", [n for n, _, _ in items])
 
 fig, axes = plt.subplots(1, 3, figsize=(15.2, 6.4), facecolor="white", dpi=DPI)
@@ -54,16 +60,22 @@ labels = [f"{n}\n[{dev}]" for n, dev, _ in items]
 colors = [c for _, _, c in items]
 ys = list(range(len(items)))[::-1]
 
+def num(v):
+    """缺测的指标记为 0（柱不出），标注用 - 占位。"""
+    return 0.0 if v is None else v
+
+
 # ---- A: 精度 ----
 ax = axes[0]
-f1s = [get(n, "macro_f1") for n, _, _ in items]
+f1s = [num(get(n, "macro_f1")) for n, _, _ in items]
 accs = [get(n, "acc") for n, _, _ in items]
 ax.barh(ys, f1s, color=colors, alpha=0.85, height=0.62)
-lo = min(f1s) - 0.04
+lo = min(v for v in f1s if v) - 0.04
 ax.set_xlim(lo, max(f1s) + 0.015)
 for y, f1, acc in zip(ys, f1s, accs):
-    ax.text(f1 + 0.002, y, f"F1 {f1:.4f}\nacc {acc:.4f}", va="center",
-            fontsize=8.6, color="#0f172a")
+    txt = "未测(纯延迟对照)" if f1 == 0 else f"F1 {f1:.4f}\nacc {acc:.4f}"
+    ax.text((f1 if f1 else lo) + 0.002, y, txt, va="center",
+            fontsize=8.4, color="#0f172a")
 ax.set_yticks(ys); ax.set_yticklabels(labels, fontsize=8.6)
 ax.set_title("精度（越高越好）", fontsize=12, fontweight="bold", color="#0f172a")
 ax.set_xlabel("macro-F1", fontsize=10)
@@ -71,10 +83,10 @@ ax.grid(axis="x", alpha=0.25)
 
 # ---- B: 体积 ----
 ax = axes[1]
-sizes = [get(n, "size_mb") for n, _, _ in items]
+sizes = [num(get(n, "size_mb")) for n, _, _ in items]
 ax.barh(ys, sizes, color=colors, alpha=0.85, height=0.62)
 for y, s in zip(ys, sizes):
-    ax.text(s + max(sizes) * 0.012, y, f"{s:.1f} MB", va="center",
+    ax.text(s + max(sizes) * 0.012, y, f"{s:.1f} MB" if s else "-", va="center",
             fontsize=9, color="#0f172a")
 ax.set_xlim(0, max(sizes) * 1.22)
 ax.set_yticks(ys); ax.set_yticklabels([]) 
@@ -84,10 +96,10 @@ ax.grid(axis="x", alpha=0.25)
 
 # ---- C: 延迟 ----
 ax = axes[2]
-lats = [get(n, "ms_per_sample") for n, _, _ in items]
+lats = [num(get(n, "ms_per_sample")) for n, _, _ in items]
 ax.barh(ys, lats, color=colors, alpha=0.85, height=0.62)
 for y, l in zip(ys, lats):
-    ax.text(l + max(lats) * 0.012, y, f"{l:.2f} ms", va="center",
+    ax.text(l + max(lats) * 0.012, y, f"{l:.2f} ms" if l else "-", va="center",
             fontsize=9, color="#0f172a")
 ax.set_xlim(0, max(lats) * 1.22)
 ax.set_yticks(ys); ax.set_yticklabels([])

@@ -13,3 +13,6 @@ resources/tfidf_clf_result.json
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# WorkBuddy 会话工作数据（项目内保留，不入库）
+.workbuddy/

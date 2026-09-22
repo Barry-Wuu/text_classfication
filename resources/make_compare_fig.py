@@ -26,6 +26,12 @@ fit = [round((r.get("fit_s") or 0.0) + (r.get("infer_s") or 0.0), 2) for r in ro
 
 
 def color(n):
+    if "蒸馏" in n:
+        return "#10b981"          # 蒸馏学生 绿
+    if "量化" in n or "NF4" in n or "INT8" in n:
+        return "#0ea5e9"          # 量化 天蓝
+    if "剪枝" in n:
+        return "#eab308"          # 剪枝 琥珀
     if "BERT" in n:
         return "#db2777"          # BERT 微调 洋红
     if n.startswith("Ensemble"):
@@ -87,7 +93,7 @@ ax.set_axisbelow(True)
 
 fig.suptitle(f"消费者投诉文本分类 · {len(names)} 个方法横向对比", fontsize=15, fontweight="bold", y=0.99)
 fig.text(0.5, 0.005,
-         "洋红=BERT 微调　蓝=线性模型　橙=树模型　紫=fastText　红=大模型 API　绿=朴素贝叶斯　灰=kNN　青=集成(专家组)（同一无泄漏划分）",
+         "洋红=BERT 微调　天蓝=量化(NF4/INT8)　琥珀=剪枝　绿=朴素贝叶斯与蒸馏学生　蓝=线性模型　橙=树模型　紫=fastText　红=大模型 API　灰=kNN　青=集成(专家组)（同一无泄漏划分）",
          ha="center", fontsize=9, color="#64748b")
 plt.tight_layout(rect=[0, 0.03, 1, 0.96])
 
