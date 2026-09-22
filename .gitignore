@@ -7,7 +7,9 @@ resources/*.pt
 # 评测输出（临时结果）
 eda/ab_result.txt
 eda/ab_speed_svm.txt
-resources/tfidf_clf_result.json
+# 注: resources/tfidf_clf_result.json 同属评测输出, 但它是榜单的唯一数据源
+# （README 5.5 表与 09/10 图的依据），且部分数据来自有每日限额的 API、无法
+# 完整重建，所以不入忽略名单，必须随仓库提供。
 
 # Python
 __pycache__/

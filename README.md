@@ -802,6 +802,7 @@ text_classfication/
     ├── bert_svc_joint.py    LinearSVC 与 BERT 逐样本联合分布复算脚本（本地版，权重需先取回）
     ├── make_venn_fig.py     5.10 节两张韦恩图生成脚本（互渗簇定性图 + 模型互补定量图）
     ├── leak_check.py        增强泄漏核查脚本
+    ├── tfidf_clf_result.json 28 个方法的榜单结果（5.5 表与 09/10 图的数据源）
     ├── ensemble_diag.json   专家组逐专家指标 + oracle 上限 + 分歧率诊断
     ├── bert_best100.json    BERT 前 100 轮最优模型依据 + epoch 1~105 逐轮曲线
     ├── confusion_matrices.json 三个传统前沿模型的 18x18 计数混淆矩阵
