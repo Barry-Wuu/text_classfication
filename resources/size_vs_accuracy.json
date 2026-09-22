@@ -1,0 +1,195 @@
+{
+ "n_classes": 18,
+ "n_classes_in_corr": 17,
+ "excluded_low_test_n": [
+  "母婴食品"
+ ],
+ "recall_source": "ComplementNB / SGD(hinge) / LinearSVC / BERT微调(ep59) 在同一无泄漏测试集(1378 条)上的逐类召回均值",
+ "correlations": {
+  "类别样本数": {
+   "pearson_r": -0.04,
+   "pearson_p": 0.8787,
+   "spearman_rho": -0.31,
+   "spearman_p": 0.2253
+  },
+  "测试集样本数": {
+   "pearson_r": -0.232,
+   "pearson_p": 0.3702,
+   "spearman_rho": -0.144,
+   "spearman_p": 0.5802
+  },
+  "无模型自洽率": {
+   "pearson_r": 0.857,
+   "pearson_p": 0.0,
+   "spearman_rho": 0.86,
+   "spearman_p": 0.0
+  },
+  "kNN同类率": {
+   "pearson_r": 0.748,
+   "pearson_p": 0.0006,
+   "spearman_rho": 0.713,
+   "spearman_p": 0.0013
+  },
+  "集体错率": {
+   "pearson_r": 0.982,
+   "pearson_p": 0.0,
+   "spearman_rho": 0.948,
+   "spearman_p": 0.0
+  }
+ },
+ "note_collective": "集体错率与召回率同源(都是同一批模型在测试集上的表现), 对本项的高相关属同义反复, 仅作口径自洽性检查, 不作独立证据",
+ "pair_contrast": {
+  "a": "电商平台",
+  "b": "金融支付",
+  "same_n": 1816,
+  "acc_a": 51.8,
+  "acc_b": 91.5,
+  "gap_points": 39.7
+ },
+ "per_class": {
+  "共享出行": {
+   "full_n": 1768,
+   "test_n": 78,
+   "mean_recall": 0.8846,
+   "self_rate": 0.6795,
+   "knn_same_rate": 0.5206,
+   "collective_wrong": 0.1026
+  },
+  "医疗健康": {
+   "full_n": 1382,
+   "test_n": 42,
+   "mean_recall": 0.9167,
+   "self_rate": 0.8333,
+   "knn_same_rate": 0.2618,
+   "collective_wrong": 0.119
+  },
+  "婚恋交友": {
+   "full_n": 1297,
+   "test_n": 24,
+   "mean_recall": 0.75,
+   "self_rate": 0.5833,
+   "knn_same_rate": 0.3045,
+   "collective_wrong": 0.25
+  },
+  "家居日用": {
+   "full_n": 1809,
+   "test_n": 76,
+   "mean_recall": 0.7829,
+   "self_rate": 0.5921,
+   "knn_same_rate": 0.3211,
+   "collective_wrong": 0.25
+  },
+  "影音娱乐": {
+   "full_n": 1813,
+   "test_n": 97,
+   "mean_recall": 0.5155,
+   "self_rate": 0.3505,
+   "knn_same_rate": 0.2385,
+   "collective_wrong": 0.4021
+  },
+  "房产家装": {
+   "full_n": 1749,
+   "test_n": 60,
+   "mean_recall": 0.875,
+   "self_rate": 0.75,
+   "knn_same_rate": 0.412,
+   "collective_wrong": 0.1
+  },
+  "教育": {
+   "full_n": 1798,
+   "test_n": 81,
+   "mean_recall": 0.9136,
+   "self_rate": 0.7901,
+   "knn_same_rate": 0.6,
+   "collective_wrong": 0.0864
+  },
+  "数码3C": {
+   "full_n": 1775,
+   "test_n": 84,
+   "mean_recall": 0.8452,
+   "self_rate": 0.6429,
+   "knn_same_rate": 0.4254,
+   "collective_wrong": 0.119
+  },
+  "旅游出行": {
+   "full_n": 1784,
+   "test_n": 84,
+   "mean_recall": 0.9345,
+   "self_rate": 0.8333,
+   "knn_same_rate": 0.5403,
+   "collective_wrong": 0.0595
+  },
+  "服饰鞋包": {
+   "full_n": 1821,
+   "test_n": 81,
+   "mean_recall": 0.8241,
+   "self_rate": 0.642,
+   "knn_same_rate": 0.3909,
+   "collective_wrong": 0.1728
+  },
+  "本地生活": {
+   "full_n": 1848,
+   "test_n": 110,
+   "mean_recall": 0.8227,
+   "self_rate": 0.7455,
+   "knn_same_rate": 0.5515,
+   "collective_wrong": 0.1636
+  },
+  "母婴食品": {
+   "full_n": 416,
+   "test_n": 6,
+   "mean_recall": 0.75,
+   "self_rate": 0.3333,
+   "knn_same_rate": 0.0326,
+   "collective_wrong": 0.3333
+  },
+  "汽车": {
+   "full_n": 1796,
+   "test_n": 84,
+   "mean_recall": 0.9315,
+   "self_rate": 0.7381,
+   "knn_same_rate": 0.5856,
+   "collective_wrong": 0.0595
+  },
+  "游戏": {
+   "full_n": 1775,
+   "test_n": 84,
+   "mean_recall": 0.9196,
+   "self_rate": 0.7619,
+   "knn_same_rate": 0.5713,
+   "collective_wrong": 0.0714
+  },
+  "物流快递": {
+   "full_n": 1766,
+   "test_n": 93,
+   "mean_recall": 0.914,
+   "self_rate": 0.8172,
+   "knn_same_rate": 0.6129,
+   "collective_wrong": 0.086
+  },
+  "电商平台": {
+   "full_n": 1816,
+   "test_n": 112,
+   "mean_recall": 0.5179,
+   "self_rate": 0.5982,
+   "knn_same_rate": 0.2562,
+   "collective_wrong": 0.4821
+  },
+  "通讯运营商": {
+   "full_n": 1771,
+   "test_n": 76,
+   "mean_recall": 0.9671,
+   "self_rate": 0.9079,
+   "knn_same_rate": 0.6174,
+   "collective_wrong": 0.0263
+  },
+  "金融支付": {
+   "full_n": 1816,
+   "test_n": 106,
+   "mean_recall": 0.9151,
+   "self_rate": 0.7736,
+   "knn_same_rate": 0.5369,
+   "collective_wrong": 0.0755
+  }
+ }
+}
