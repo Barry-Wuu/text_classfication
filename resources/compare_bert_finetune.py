@@ -60,7 +60,7 @@ BATCH = 32
 LR = 2e-5
 MODEL_PATH = "bert-base-chinese"
 
-RAW_URL = "https://raw.githubusercontent.com/paixiaoxin66/text_classfication/Barry/train_augmented.csv"
+RAW_URL = "https://raw.githubusercontent.com/Barry-Wuu/text_classfication/main/train_augmented.csv"
 MIRROR_URL = "https://ghfast.top/" + RAW_URL
 
 

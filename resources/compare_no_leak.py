@@ -52,7 +52,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 SEED = 42
 MAX_LEN = 200
-RAW_URL = "https://raw.githubusercontent.com/paixiaoxin66/text_classfication/Barry/train_augmented.csv"
+RAW_URL = "https://raw.githubusercontent.com/Barry-Wuu/text_classfication/main/train_augmented.csv"
 MIRROR_URL = "https://ghfast.top/" + RAW_URL
 
 def fetch():

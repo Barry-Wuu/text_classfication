@@ -49,7 +49,7 @@ import scipy.sparse as sp
 
 SEED = 42
 MAX_LEN = 200
-RAW_URL = "https://raw.githubusercontent.com/paixiaoxin66/text_classfication/Barry/labeled.csv"
+RAW_URL = "https://raw.githubusercontent.com/Barry-Wuu/text_classfication/main/labeled.csv"
 MIRROR_URL = "https://ghfast.top/" + RAW_URL
 
 def report(name, dim, Xtr, Xte, ytr, yte, extra=""):

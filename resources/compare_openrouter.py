@@ -116,7 +116,7 @@ def _post(session, key, body, retries=6):
             r = session.post(URL, data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
                              headers={"Authorization": "Bearer " + key,
                                       "Content-Type": "application/json",
-                                      "HTTP-Referer": "https://github.com/paixiaoxin66/text_classfication",
+                                      "HTTP-Referer": "https://github.com/Barry-Wuu/text_classfication",
                                       "X-Title": "text_classification eval"},
                              timeout=300)
             if r.status_code == 200:

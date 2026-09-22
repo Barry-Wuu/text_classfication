@@ -65,7 +65,7 @@ DROP_ACC = 0.03           # test_acc 相对最佳下降该幅度即判"明显下
 MODEL_PATH = "bert-base-chinese"
 UPSTREAM_SLUG = "textcls-bert-finetune"
 
-RAW_URL = "https://raw.githubusercontent.com/paixiaoxin66/text_classfication/Barry/train_augmented.csv"
+RAW_URL = "https://raw.githubusercontent.com/Barry-Wuu/text_classfication/main/train_augmented.csv"
 MIRROR_URL = "https://ghfast.top/" + RAW_URL
 
 

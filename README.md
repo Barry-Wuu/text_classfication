@@ -378,7 +378,7 @@ BERT（`bert-base-chinese`，12 层、约 1.1 亿参数）在 Kaggle 云端 GPU 
 - **测试集准确率**（红）在约第 30 轮后进入 84% 到 86% 的平台期，此后反复震荡，不再随训练增长；
 - 两条线之间的蓝色张口就是过拟合：末轮已达 15.1 个百分点（98.1% 对 83.0%）。但这个张口并未像"整份训练集"那样迅速恶化到测试崩塌，原因是每轮都换一批新的随机 1,024 条，等于用持续的随机梯度噪声做正则，把过拟合显著推后。这正是"抽样而非整份训练"的价值所在。
 
-> 训练脚本：`resources/compare_bert_finetune.py`（首 10 轮）与 `resources/continue_bert/`、`resources/continue_bert2/`、`resources/continue_bert3/`（逐阶段续训至 105 轮）；逐轮曲线与选模依据见 GitHub Release `bert-weights` 附件 `bert_best100.json`，前 100 轮最优权重为 `bert_epoch59.pt`。
+> 训练脚本：`resources/compare_bert_finetune.py`（首 10 轮）与 `resources/continue_bert/`、`resources/continue_bert2/`、`resources/continue_bert3/`（逐阶段续训至 105 轮）；逐轮曲线与选模依据见 7.3 节的 Release 附件 `bert_best100.json`，前 100 轮最优权重为 `bert_epoch59.pt`。
 
 ### 5.9 四个代表模型的 18 阶混淆矩阵
 
@@ -695,8 +695,17 @@ BERT-INT8 动态量化在纯 CPU 上的预测结果：
 | `bert_nf4_state.pt`（NF4 4bit 量化，F1 0.8590） | 108.2 MB | GPU + bitsandbytes | [下载](https://github.com/Barry-Wuu/text_classfication/releases/download/deploy-models/bert_nf4_state.pt) |
 | `bert_int8_state.pt`（INT8 动态量化，F1 0.8518） | 145.6 MB | 纯 CPU | [下载](https://github.com/Barry-Wuu/text_classfication/releases/download/deploy-models/bert_int8_state.pt) |
 | `deploy_models_meta.json`（加载说明与指标） | 2 KB | — | [下载](https://github.com/Barry-Wuu/text_classfication/releases/download/deploy-models/deploy_models_meta.json) |
-| 原版 BERT 微调权重 `bert_epoch59.pt`（F1 0.8660，教师模型） | 390.3 MB | GPU | [下载](https://github.com/paixiaoxin66/text_classfication/releases/download/bert-weights/bert_epoch59.pt) |
+| 原版 BERT 微调权重 `bert_epoch59.pt`（F1 0.8660，教师模型） | 390.3 MB | GPU | [下载](https://github.com/Barry-Wuu/text_classfication/releases/download/bert-weights/bert_epoch59.pt) |
 | 两个非 BERT 模型（ComplementNB / SGD(hinge)） | 5.2 MB | 纯 CPU | 随仓库提供：`deploy/models/` |
+
+全部权重统一托管在**本仓库**（`Barry-Wuu/text_classfication`）的 Release 里，共两个：
+
+| Release | 内容 |
+| --- | --- |
+| [`bert-weights`](https://github.com/Barry-Wuu/text_classfication/releases/tag/bert-weights) | BERT 微调权重：打榜模型 `bert_epoch59.pt` + 3 个训练检查点（`bert_epoch10/26/60.pt`）+ 选模证据 `bert_best100.json` + 训练日志 `result*.json`，合计 1.52 GB |
+| [`deploy-models`](https://github.com/Barry-Wuu/text_classfication/releases/tag/deploy-models) | 部署用量化权重：`bert_nf4_state.pt`、`bert_int8_state.pt` 与 `deploy_models_meta.json` |
+
+> 原先 BERT 权重挂在组长仓库的 Release 上，现已整体迁移到本仓库；README 与各脚本里的下载链接（含 Kaggle 脚本取数据用的 raw 链接）同步更新，仓库内不再引用外部仓库。
 
 **下载后的放置方式**
 
