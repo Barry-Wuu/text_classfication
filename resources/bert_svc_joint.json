@@ -1,0 +1,137 @@
+{
+ "共享出行": {
+  "n": 78,
+  "both": 65,
+  "svc_only": 5,
+  "bert_only": 3,
+  "neither": 5
+ },
+ "医疗健康": {
+  "n": 42,
+  "both": 37,
+  "svc_only": 0,
+  "bert_only": 3,
+  "neither": 2
+ },
+ "婚恋交友": {
+  "n": 24,
+  "both": 15,
+  "svc_only": 2,
+  "bert_only": 3,
+  "neither": 4
+ },
+ "家居日用": {
+  "n": 76,
+  "both": 57,
+  "svc_only": 1,
+  "bert_only": 8,
+  "neither": 10
+ },
+ "影音娱乐": {
+  "n": 97,
+  "both": 40,
+  "svc_only": 17,
+  "bert_only": 13,
+  "neither": 27
+ },
+ "房产家装": {
+  "n": 60,
+  "both": 48,
+  "svc_only": 2,
+  "bert_only": 4,
+  "neither": 6
+ },
+ "教育": {
+  "n": 81,
+  "both": 71,
+  "svc_only": 1,
+  "bert_only": 5,
+  "neither": 4
+ },
+ "数码3C": {
+  "n": 84,
+  "both": 69,
+  "svc_only": 5,
+  "bert_only": 4,
+  "neither": 6
+ },
+ "旅游出行": {
+  "n": 84,
+  "both": 78,
+  "svc_only": 0,
+  "bert_only": 2,
+  "neither": 4
+ },
+ "服饰鞋包": {
+  "n": 81,
+  "both": 60,
+  "svc_only": 5,
+  "bert_only": 6,
+  "neither": 10
+ },
+ "本地生活": {
+  "n": 110,
+  "both": 87,
+  "svc_only": 5,
+  "bert_only": 5,
+  "neither": 13
+ },
+ "母婴食品": {
+  "n": 6,
+  "both": 4,
+  "svc_only": 0,
+  "bert_only": 2,
+  "neither": 0
+ },
+ "汽车": {
+  "n": 84,
+  "both": 76,
+  "svc_only": 1,
+  "bert_only": 1,
+  "neither": 6
+ },
+ "游戏": {
+  "n": 84,
+  "both": 73,
+  "svc_only": 2,
+  "bert_only": 4,
+  "neither": 5
+ },
+ "物流快递": {
+  "n": 93,
+  "both": 80,
+  "svc_only": 3,
+  "bert_only": 6,
+  "neither": 4
+ },
+ "电商平台": {
+  "n": 112,
+  "both": 48,
+  "svc_only": 8,
+  "bert_only": 39,
+  "neither": 17
+ },
+ "通讯运营商": {
+  "n": 76,
+  "both": 71,
+  "svc_only": 1,
+  "bert_only": 3,
+  "neither": 1
+ },
+ "金融支付": {
+  "n": 106,
+  "both": 92,
+  "svc_only": 5,
+  "bert_only": 7,
+  "neither": 2
+ },
+ "_overall": {
+  "n": 1378,
+  "both": 1071,
+  "svc_only": 63,
+  "bert_only": 118,
+  "neither": 126,
+  "svc_acc": 0.8229,
+  "bert_acc": 0.8628
+ }
+}
