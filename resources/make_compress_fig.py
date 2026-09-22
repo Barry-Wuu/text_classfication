@@ -34,30 +34,31 @@ def get(name, key):
     return v.get(key)
 
 
-# 展示顺序与设备标注（名称, 设备, 颜色）
+# 展示顺序与设备标注（JSON 键, 图中显示名, 设备, 颜色）
 ITEMS = [
-    ("教师BERT fp32",            "GPU", "#d946ef"),
-    ("NF4 4bit量化(GPU)",        "GPU", "#3b82f6"),
-    ("剪枝30%(非结构化)",         "GPU", "#f59e0b"),
-    ("剪枝50%(非结构化)",         "GPU", "#f59e0b"),
-    ("蒸馏LSTM学生 256维(20轮)",   "GPU", "#10b981"),
-    ("蒸馏LSTM学生 128维(8轮)",    "GPU", "#10b981"),
-    ("教师BERT fp32-CPU",        "CPU", "#d946ef"),
-    ("INT8动态量化(CPU)",         "CPU", "#3b82f6"),
-    ("剪枝30%(CPU)",             "CPU", "#f59e0b"),
-    ("蒸馏LSTM学生 256维(20轮)-CPU", "CPU", "#10b981"),
-    ("蒸馏LSTM学生 256维+INT8(CPU)", "CPU", "#10b981"),
-    ("蒸馏LSTM学生 128维(8轮)-CPU", "CPU", "#10b981"),
-    ("蒸馏LSTM学生 128维+INT8(CPU)", "CPU", "#10b981"),
+    ("教师BERT fp32",              "原版 BERT（教师）fp32",   "GPU", "#d946ef"),
+    ("NF4 4bit量化(GPU)",          "NF4 4bit 量化",           "GPU", "#3b82f6"),
+    ("剪枝30%(非结构化)",           "非结构化剪枝 30%",         "GPU", "#f59e0b"),
+    ("剪枝50%(非结构化)",           "非结构化剪枝 50%",         "GPU", "#f59e0b"),
+    ("蒸馏LSTM学生 256维(20轮)",    "蒸馏 LSTM 学生 256 维（20 轮）", "GPU", "#10b981"),
+    ("蒸馏LSTM学生 128维(8轮)",     "蒸馏 LSTM 学生 128 维（8 轮）",  "GPU", "#10b981"),
+    ("教师BERT fp32-CPU",          "原版 BERT（教师）fp32",   "CPU", "#d946ef"),
+    ("INT8动态量化(CPU)",          "INT8 动态量化（DQ）",      "CPU", "#3b82f6"),
+    ("剪枝30%(CPU)",               "非结构化剪枝 30%",         "CPU", "#f59e0b"),
+    ("蒸馏LSTM学生 256维(20轮)-CPU", "蒸馏 LSTM 学生 256 维",    "CPU", "#10b981"),
+    ("蒸馏LSTM学生 256维+INT8(CPU)", "蒸馏 LSTM 学生 256 维 + INT8", "CPU", "#10b981"),
+    ("蒸馏LSTM学生 128维(8轮)-CPU",  "蒸馏 LSTM 学生 128 维",    "CPU", "#10b981"),
+    ("蒸馏LSTM学生 128维+INT8(CPU)", "蒸馏 LSTM 学生 128 维 + INT8", "CPU", "#10b981"),
 ]
-items = [(n, dev, c) for n, dev, c in ITEMS if get(n, "macro_f1") is not None
-         or (get(n, "ms_per_sample") is not None and get(n, "size_mb") is not None)]
-print("可用方案:", [n for n, _, _ in items])
+items = [(k, lab, dev, c) for k, lab, dev, c in ITEMS
+         if get(k, "macro_f1") is not None
+         or (get(k, "ms_per_sample") is not None and get(k, "size_mb") is not None)]
+print("可用方案:", [lab for _, lab, _, _ in items])
 
 fig, axes = plt.subplots(1, 3, figsize=(15.2, 6.4), facecolor="white", dpi=DPI)
 
-labels = [f"{n}\n[{dev}]" for n, dev, _ in items]
-colors = [c for _, _, c in items]
+labels = [f"{lab}\n[{dev}]" for _, lab, dev, _ in items]
+colors = [c for _, _, _, c in items]
 ys = list(range(len(items)))[::-1]
 
 def num(v):
@@ -67,8 +68,8 @@ def num(v):
 
 # ---- A: 精度 ----
 ax = axes[0]
-f1s = [num(get(n, "macro_f1")) for n, _, _ in items]
-accs = [get(n, "acc") for n, _, _ in items]
+f1s = [num(get(k, "macro_f1")) for k, _, _, _ in items]
+accs = [get(k, "acc") for k, _, _, _ in items]
 ax.barh(ys, f1s, color=colors, alpha=0.85, height=0.62)
 lo = min(v for v in f1s if v) - 0.04
 ax.set_xlim(lo, max(f1s) + 0.015)
@@ -83,7 +84,7 @@ ax.grid(axis="x", alpha=0.25)
 
 # ---- B: 体积 ----
 ax = axes[1]
-sizes = [num(get(n, "size_mb")) for n, _, _ in items]
+sizes = [num(get(k, "size_mb")) for k, _, _, _ in items]
 ax.barh(ys, sizes, color=colors, alpha=0.85, height=0.62)
 for y, s in zip(ys, sizes):
     ax.text(s + max(sizes) * 0.012, y, f"{s:.1f} MB" if s else "-", va="center",
@@ -96,7 +97,7 @@ ax.grid(axis="x", alpha=0.25)
 
 # ---- C: 延迟 ----
 ax = axes[2]
-lats = [num(get(n, "ms_per_sample")) for n, _, _ in items]
+lats = [num(get(k, "ms_per_sample")) for k, _, _, _ in items]
 ax.barh(ys, lats, color=colors, alpha=0.85, height=0.62)
 for y, l in zip(ys, lats):
     ax.text(l + max(lats) * 0.012, y, f"{l:.2f} ms" if l else "-", va="center",
