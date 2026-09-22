@@ -61,6 +61,26 @@ labels = [f"{lab}\n[{dev}]" for _, lab, dev, _ in items]
 colors = [c for _, _, _, c in items]
 ys = list(range(len(items)))[::-1]
 
+# 同权重继承：这些行是"同一份权重换设备只测延迟"，精度取同权重的已测值
+# （精度与设备无关，CPU 上未重复评测，标注时加"同权重"以免误读为新测量）
+INHERIT = {
+    "剪枝30%(CPU)": "剪枝30%(非结构化)",
+    "蒸馏LSTM学生 128维(8轮)-CPU": "蒸馏LSTM学生 128维(8轮)",
+    "蒸馏LSTM学生 256维(20轮)-CPU": "蒸馏LSTM学生 256维(20轮)",
+}
+INHERITED = set()
+
+
+def mget(key, metric):
+    """取指标：自身没测则继承同权重行，并登记为继承值。"""
+    v = get(key, metric)
+    if v is None and key in INHERIT:
+        v = get(INHERIT[key], metric)
+        if v is not None:
+            INHERITED.add((key, metric))
+    return v
+
+
 def num(v):
     """缺测的指标记为 0（柱不出），标注用 - 占位。"""
     return 0.0 if v is None else v
@@ -68,13 +88,18 @@ def num(v):
 
 # ---- A: 精度 ----
 ax = axes[0]
-f1s = [num(get(k, "macro_f1")) for k, _, _, _ in items]
-accs = [get(k, "acc") for k, _, _, _ in items]
+f1s = [num(mget(k, "macro_f1")) for k, _, _, _ in items]
+accs = [mget(k, "acc") for k, _, _, _ in items]
 ax.barh(ys, f1s, color=colors, alpha=0.85, height=0.62)
 lo = min(v for v in f1s if v) - 0.04
 ax.set_xlim(lo, max(f1s) + 0.015)
-for y, f1, acc in zip(ys, f1s, accs):
-    txt = "未测(纯延迟对照)" if f1 == 0 else f"F1 {f1:.4f}\nacc {acc:.4f}"
+for y, (k, _, _, _), f1, acc in zip(ys, items, f1s, accs):
+    if f1 == 0:
+        txt = "未测"
+    elif (k, "macro_f1") in INHERITED:
+        txt = f"F1 {f1:.4f}\nacc {acc:.4f}（同权重）"
+    else:
+        txt = f"F1 {f1:.4f}\nacc {acc:.4f}"
     ax.text((f1 if f1 else lo) + 0.002, y, txt, va="center",
             fontsize=8.4, color="#0f172a")
 ax.set_yticks(ys); ax.set_yticklabels(labels, fontsize=8.6)
