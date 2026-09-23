@@ -29,21 +29,21 @@ fit = [round((r.get("fit_s") or 0.0) + (r.get("infer_s") or 0.0), 2) for r in ro
 
 def color(n):
     if "蒸馏" in n:
-        return "#10b981"          # 蒸馏学生 绿
+        return "#115e59"          # 蒸馏学生 深青绿（区别于朴素贝叶斯的亮绿）
     if "量化" in n or "NF4" in n or "INT8" in n:
         return "#0ea5e9"          # 量化 天蓝
     if "剪枝" in n:
-        return "#eab308"          # 剪枝 琥珀
+        return "#78350f"          # 剪枝 深棕（与树模型的亮橙同色系但极深）
     if "BERT" in n:
         return "#db2777"          # BERT 微调 洋红
     if n.startswith("Ensemble"):
-        return "#06b6d4"          # 集成(专家组) 青
+        return "#7c3aed"          # 集成(专家组) 深紫
     if n in ("LinearSVC", "SGD(hinge)", "LogisticRegression"):
         return "#3b82f6"          # 线性 蓝
     if n in ("RandomForest", "ExtraTrees", "XGBoost", "LightGBM"):
         return "#f59e0b"          # 树 橙
     if n == "fastText":
-        return "#8b5cf6"          # 紫
+        return "#4d7c0f"          # fastText 橄榄
     if "Jev" in n or "LLM" in n or n.startswith("LLM:"):
         return "#ef4444"          # 大模型 API 红
     if "NB" in n:
@@ -95,7 +95,7 @@ ax.set_axisbelow(True)
 
 fig.suptitle(f"消费者投诉文本分类 · {len(names)} 个方法横向对比", fontsize=15, fontweight="bold", y=0.99)
 fig.text(0.5, 0.005,
-         "洋红=BERT 微调　天蓝=量化(NF4/INT8)　琥珀=剪枝　绿=朴素贝叶斯与蒸馏学生　蓝=线性模型　橙=树模型　紫=fastText　红=大模型 API　灰=kNN　青=集成(专家组)（同一无泄漏划分）",
+         "洋红=BERT 微调　天蓝=量化(NF4/INT8)　深棕=剪枝　深青=蒸馏学生　绿=朴素贝叶斯　蓝=线性模型　橙=树模型　橄榄=fastText　深紫=集成(专家组)　红=大模型 API　灰=kNN（同一无泄漏划分）",
          ha="center", fontsize=9, color="#64748b")
 plt.tight_layout(rect=[0, 0.03, 1, 0.96])
 
