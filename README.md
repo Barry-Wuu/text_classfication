@@ -572,14 +572,14 @@ BERT（`bert-base-chinese`，12 层、约 1.1 亿参数）在 Kaggle 云端 GPU 
 - **体积**：`state_dict` 存盘的实际字节数；
 - **速度**：全测试集推理延迟，1 次预热 + 3 次计时取中位，batch=128、max_len=128（GPU 计时带 `cuda.synchronize()`），换算成 **ms/样本**。
 
-四种方式各跑一个独立 Kaggle 内核（互不干扰、可单独复跑）：
+四种方式各跑一个独立 Kaggle 内核（互不干扰、可单独复跑）；内核源码收在本仓库 `kaggle/` 目录，含复现顺序、GH_TOKEN 配置与推送命令：
 
-| 方案 | 原理一句话 | 内核 |
+| 方案 | 原理一句话 | 内核（源码目录 · 内核 id） |
 | --- | --- | --- |
-| INT8 动态量化（DQ） | 推理时把 Linear 权重按 int8 反量化算 | `wubarry/textcls-cmp-int8` |
-| NF4 4bit 量化 | encoder 的 Linear 换成 bnb NF4 4bit，GPU 上逐层去量化 | `wubarry/textcls-cmp-nf4b` |
-| 软标签蒸馏 | LSTM 学生学教师的 softmax 分布（KL 散度，T=2、α=0.7） | `wubarry/textcls-cmp-kd2` / `-kd3` |
-| 非结构化剪枝 | 全局 L1 把最小权重置零（30% / 50%） | `wubarry/textcls-cmp-prune` |
+| INT8 动态量化（DQ） | 推理时把 Linear 权重按 int8 反量化算 | `kaggle/cmp_int8/` · `wubarry/textcls-cmp-int8` |
+| NF4 4bit 量化 | encoder 的 Linear 换成 bnb NF4 4bit，GPU 上逐层去量化 | `kaggle/cmp_nf4/` · `wubarry/textcls-cmp-nf4b` |
+| 软标签蒸馏 | LSTM 学生学教师的 softmax 分布（KL 散度，T=2、α=0.7） | `kaggle/cmp_kd2/`、`kaggle/cmp_kd3/` · `wubarry/textcls-cmp-kd2` / `-kd3` |
+| 非结构化剪枝 | 全局 L1 把最小权重置零（30% / 50%） | `kaggle/cmp_prune/` · `wubarry/textcls-cmp-prune` |
 
 ![模型压缩四方案对比](resources/figures/19_compress_compare.png)
 
@@ -799,6 +799,21 @@ text_classfication/
 │   ├── dim_reduction.py     降维可视化脚本（TF-IDF → SVD → t-SNE，三面板）
 │   ├── dim_reduction.json   降维口径、kNN 同类率与各类簇中心坐标
 │   └── figures/             分析图表（含词云与降维可视化）
+├── kaggle/                  Kaggle 内核源码（GPU 实验与云上传）
+│   ├── README.md            内核清单、复现顺序与 GH_TOKEN 配置
+│   ├── cmp_int8/            INT8 动态量化内核（CPU）
+│   ├── cmp_nf4/             NF4 4bit 量化内核（GPU + bitsandbytes）
+│   ├── cmp_prune/           非结构化剪枝内核（30% 与 50%）
+│   ├── cmp_kd/             软标签蒸馏 v1（沿用抽样协议的反面实验）
+│   ├── cmp_kd2/            软标签蒸馏 v2（LSTM 128 维 8 轮）
+│   ├── cmp_kd3/            软标签蒸馏 v3（LSTM 256 维 20 轮，最终采用）
+│   ├── bert_cm/             BERT 混淆矩阵内核（产出 bert_confusion.json）
+│   ├── bert_joint/          LinearSVC 与 BERT 逐样本联合分布内核（产出 bert_svc_joint.json）
+│   ├── export_models/       量化权重直传 Release deploy-models
+│   ├── migrate_release/     Release 附件跨仓库搬运内核
+│   ├── github_bert_push/    BERT 打榜权重直传 Release bert-weights
+│   ├── gen_kernels.py       压缩内核的批量生成器（改配置即重出全部内核）
+│   └── deprecated/          弃用版本（BERT 训 BERT、LSTM v2 报错版）
 └── resources/               预处理与建模资产
     ├── preprocess.py        字符级清洗脚本
     ├── normalize_ids.py     强标识符省流脚本

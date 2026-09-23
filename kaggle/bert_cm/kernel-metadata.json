@@ -1,0 +1,16 @@
+{
+  "id": "wubarry/textcls-bert-cm",
+  "title": "textcls bert cm",
+  "code_file": "bert_cm.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_internet": true,
+  "enable_tpu": false,
+  "keywords": [],
+  "dataset_sources": [],
+  "kernel_sources": [],
+  "competition_sources": [],
+  "model_sources": []
+}

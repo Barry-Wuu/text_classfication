@@ -1,0 +1,16 @@
+{
+ "id": "wubarry/textcls-cmp-kd2",
+ "title": "textcls cmp kd2",
+ "code_file": "cmp_kd2.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": true,
+ "enable_gpu": true,
+ "enable_internet": true,
+ "enable_tpu": false,
+ "keywords": [],
+ "dataset_sources": [],
+ "kernel_sources": [],
+ "competition_sources": [],
+ "model_sources": []
+}
