@@ -35,7 +35,7 @@ os.makedirs(OUT, exist_ok=True)
 
 INK = "#0f172a"
 C_SVC = "#3b82f6"      # LinearSVC（蓝）
-C_BERT = "#d946ef"     # BERT（洋红），与打榜图配色一致
+C_BERT = "#f59e0b"     # BERT（橙），与打榜图配色一致
 C_E = "#f59e0b"        # 电商平台（橙）
 C_F = "#10b981"        # 服饰鞋包（绿）
 C_H = "#3b82f6"        # 家居日用（蓝）

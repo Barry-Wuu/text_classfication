@@ -60,7 +60,7 @@ def color(n):
     if "LLM" in n or "Jev" in n:
         return "#ef4444"          # 第三方大模型 API 红
     if "BERT" in n or "蒸馏" in n:
-        return "#db2777"          # BERT 系（微调 / 量化 / 剪枝 / 蒸馏产物）洋红
+        return "#f59e0b"          # BERT 系（微调 / 量化 / 剪枝 / 蒸馏产物）橙
     return "#3b82f6"              # 传统机器学习及其组合 蓝
 
 
@@ -135,7 +135,7 @@ ax.set_axisbelow(True)
 ax.margins(x=0.08, y=0.12)
 
 fig.text(0.5, 0.012,
-         "洋红=BERT 系（微调及其压缩产物：量化 / 剪枝 / 蒸馏）　蓝=传统机器学习及其组合（线性 / 贝叶斯 / 树 / kNN / fastText / 集成）　红=第三方大模型 API　"
+         "橙=BERT 系（微调及其压缩产物：量化 / 剪枝 / 蒸馏）　蓝=传统机器学习及其组合（线性 / 贝叶斯 / 树 / kNN / fastText / 集成）　红=第三方大模型 API　"
          "　红点+虚线=帕累托最优前沿（不被任何方法支配）",
          ha="center", fontsize=9, color="#64748b")
 plt.tight_layout(rect=[0, 0.03, 1, 1])   # 必须先于标签排版：它会改变 axes 位置

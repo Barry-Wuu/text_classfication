@@ -33,7 +33,7 @@ def color(n):
     if "LLM" in n or "Jev" in n:
         return "#ef4444"          # 第三方大模型 API 红
     if "BERT" in n or "蒸馏" in n:
-        return "#db2777"          # BERT 系（微调 / 量化 / 剪枝 / 蒸馏产物）洋红
+        return "#f59e0b"          # BERT 系（微调 / 量化 / 剪枝 / 蒸馏产物）橙
     return "#3b82f6"              # 传统机器学习及其组合 蓝
 
 
@@ -81,7 +81,7 @@ ax.set_axisbelow(True)
 
 fig.suptitle(f"消费者投诉文本分类 · {len(names)} 个方法横向对比", fontsize=15, fontweight="bold", y=0.99)
 fig.text(0.5, 0.005,
-         "洋红=BERT 系（微调及其压缩产物：量化 / 剪枝 / 蒸馏）　蓝=传统机器学习及其组合（线性 / 贝叶斯 / 树 / kNN / fastText / 集成）　红=第三方大模型 API（同一无泄漏划分）",
+         "橙=BERT 系（微调及其压缩产物：量化 / 剪枝 / 蒸馏）　蓝=传统机器学习及其组合（线性 / 贝叶斯 / 树 / kNN / fastText / 集成）　红=第三方大模型 API（同一无泄漏划分）",
          ha="center", fontsize=9, color="#64748b")
 plt.tight_layout(rect=[0, 0.03, 1, 0.96])
 
